@@ -2,7 +2,7 @@
 
 ### Features.
 1. Autogeneration of Translation-Files from source code.
-2. Translations-Files are php Arrays. (less friendly, doesn't need external tools, best performace than ini files)
+2. Translations-Files are php Arrays. (less friendly but doesn't need external tools, best performace than ini files)
 4. Shows default message if doesn't find a translation.
 5. Works as print or printf.
 6. Keep translated Messages when generates Traslation-Files again.
