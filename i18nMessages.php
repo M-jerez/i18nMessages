@@ -6,23 +6,16 @@ class i18nMessages {
     
    
 
-    const pattern = "/\sp\(.*\)/";
+    //const pattern = "/\sp\(.*\)/";
     const copyright = "/** \n* This file is generated with 'i18nMessages.php' \n* Website: http://github.com/M-jerez/ \n* Author : m-jerez \n*/";
-    const languagesDir = '/lang/';
-    const oldDir = '/lang/old/';
+    const languagesDir = 'lang';
+    const oldDir = 'old';
     const phpExtension = '.php';
     
+    
+    public static $rootDir = __DIR__;
     public static $locale = 'es';
     public static $languages = array('en', 'es');
-
-    private $oldTranslations;
-    private $newTranslations;
-    private $messages;
-
-    function __construct() {
-        $languagesDir = __DIR__ . self::languagesDir;
-        $this->messages = self::initLangArray($languagesDir);
-    }
 
     /**
      * Sets the default language 'Locale' to work with. Messages are translated tho this
@@ -41,26 +34,44 @@ class i18nMessages {
         self::$languages = $languagesArray;
     }
     
+    /**
+     * Sets a new root directory from which scan all source code.
+     * @param type $rootDir the new root Dyrectory
+     */
+    public static function setRootDirectory($rootDir){
+        self::$rootDir = $rootDir;
+    }
+    
+    private $oldTranslations;
+    private $newTranslations;
+    private $messages;
+    
+    
+    function __construct() {
+        $this->messages = self::initLangArray();
+    }
+    
     /** 
      * Creates and initilize a language array with the existing languages files.
      * This function makes use of require() to load lang files, so it throws a fatal error
      * if the lang file doesn't exist. you must use of the compile() function of this class
      * to create an empty language file and avoid this error.
      * 
-     * @param type $directory the directory withing the languages files
+     * @param type $subdirectory the subdirectory withing the languages files
      */
-    private static function initLangArray($directory) {
+    private static function initLangArray($subdirectory="") {
         $langsArray = self::createLangArray();
-        $ext = self::phpExtension;     
-        $phpFiles = glob("$directory*$ext");
-        
+        $ext = self::phpExtension; 
+        $ds = DIRECTORY_SEPARATOR;
+        $languagesDir = self::$rootDir. $ds .self::languagesDir. $ds .$subdirectory;
+        $phpFiles = glob("$languagesDir*$ext");        
         foreach ($phpFiles as $filename) {
             foreach ($langsArray as $lang) {
                 $langFilename = $languagesDir . $lang . $ext;
                 if ($filename == $langFilename) {
                     $aux = require($langFilename);
                     if (is_array(aux))
-                        $array[$lang] = $aux;
+                        $langsArray[$lang] = $aux;
                 }
             }
         }        
@@ -90,13 +101,10 @@ class i18nMessages {
      * Scans all php files searching for calls to the p() function and creates 
      * languages files from the calls found.
      * 
-     * @param type $rootDir
      */
-    public function compile($rootDir) {
-        $languagesDir = __DIR__ . self::languagesDir;
-        $oldDir = __DIR__ . self::oldDir;
-        $this->newTranslations = self::initLangArray($languagesDir);        
-        $this->oldTranslations = self::initLangArray($oldDir);
+    public function compile() {
+        $this->newTranslations = self::initLangArray();        
+        $this->oldTranslations = self::initLangArray(self::oldDir);
         $this->readSources();
         $this->save();
     }    
@@ -109,8 +117,8 @@ class i18nMessages {
      */
     private function readSources() {
         $ext = self::phpExtension;
-        $sorceFiles = glob(__DIR__ . DIRECTORY_SEPARATOR . "*$ext");
- 
+        $sorceFiles = self::rglob(self::$rootDir);
+        
         foreach ($sorceFiles as $filename) {
             if (__FILE__ == $filename)
                 continue;
@@ -125,6 +133,21 @@ class i18nMessages {
                 } 
             }
         }
+    }
+    
+    private static function rglob($path) {
+        $directories = glob($path. DIRECTORY_SEPARATOR ."*", GLOB_ONLYDIR|GLOB_NOSORT); 
+        $ext = self::phpExtension;
+        $files = glob($path. DIRECTORY_SEPARATOR . "*$ext");
+        foreach ($directories as $dirName) {
+            $langdir = self::$rootDir. DIRECTORY_SEPARATOR .self::languagesDir;
+            if($dirName==$langdir)
+                    continue;
+            $subFiles = self::rglob($dirName);
+            if($subFiles!=null)
+                $files = array_merge($files,$subFiles );
+        }
+        return $files;
     }
     
     /**
@@ -183,13 +206,13 @@ class i18nMessages {
      * A copy of old messages is stored in the /old directory.
      */
     private function save() {
-        $LangDir = __DIR__ . "/" . self::languagesDir;
-        $LangDirOld = self::languagesDir . self::oldDir;
-        if (!file_exists($LangDir)) {
-            mkdir($LangDir, 0777, true);
+        $langsDir = self::$rootDir . DIRECTORY_SEPARATOR . self::languagesDir . DIRECTORY_SEPARATOR;
+        $oldsDir = $langsDir . self::oldDir . DIRECTORY_SEPARATOR;
+        if (!file_exists($langsDir)) {
+            mkdir($langsDir, 0777, true);
         }
-        if (!file_exists($LangDirOld)) {
-            mkdir($LangDirOld, 0777, true);
+        if (!file_exists($oldsDir)) {
+            mkdir($oldsDir, 0777, true);
         }
 
         foreach (self::$languages as $lang) {
@@ -207,7 +230,7 @@ class i18nMessages {
                 $result .= "/* $linenum */\n$key \n => \n$delimiter$message$delimiter \n, \n\n";
             }
             $result .= ");";
-            file_put_contents($LangDir . $filename, trim($result));
+            file_put_contents($langsDir . $filename, trim($result));
 
             //BACKUP OLD VALUES
             /*
