@@ -51,7 +51,7 @@ p("item: $number"); // THIS IS NOT ALLOWED, throws fatal error when compile Tran
 p("item: %d", $number); // THIS IS CORRECT
        
 ```
-### Translation-Files Automatic Generation.
+### Automatic Generation of Translation-Files.
 ```php
 //import and init.
 require_once 'i18nMessages.php';
