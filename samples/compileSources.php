@@ -4,6 +4,9 @@ include_once 'i18nMessages.php';
 //creates the i18n object with default locale = 'en'.
 $messages = new i18nMessages();
 
+//set the languges to generated Translation-Files
+i18nMessages::setlanguages(array('en','es','de'));
+
 /* 
  * Creates translation files parsing the source code.
  * The system scans all directories from the current directory
@@ -17,5 +20,8 @@ $messages->compile();
  */
 $rootDir = __DIR__;
 $messages->compile($rootDir);
+// same as
+i18nMessages::setRootDirectory($rootDir);
+$messages->compile();
 
 ?>

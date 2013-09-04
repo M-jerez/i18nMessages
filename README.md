@@ -17,12 +17,12 @@
 ### Usage.
 ```php
 <?php
-//import and init with 'fr' locale. If omitted default locale is 'en'.
+//import and set 'fr' locale. If omitted default locale is 'en'.
 require_once 'i18nMessages.php';
-$messages = new i18nMessages('fr');
+i18nMessages::setLocale('fr');
 
 //Sets all languages to work with.
-$messages->setlanguages(array('en','es','de'));
+i18nMessages::setlanguages(array('en','es','de'));
 ?>
 ```
 ```html

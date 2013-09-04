@@ -13,8 +13,9 @@ class i18nMessages {
     const phpExtension = '.php';
     
     
-    public static $rootDir = __DIR__;
-    
+    private static $rootDir = __DIR__;
+    private static $locale = 'en';
+    private static $languages = array('en', 'es', 'fr', 'de');
 
     
     
@@ -26,34 +27,32 @@ class i18nMessages {
         self::$rootDir = $rootDir;
     }
     
-    private $systemTranslations;
-    private $newTranslations;
-    private $messages;
-    private $locale;
-    private $languages;
-    
-    function __construct($locale='en',$languagesArray=array('en', 'es', 'fr', 'de')) {
-        $this->locale = $locale;
-        $this->languages = $languagesArray;
-        $this->messages = self::initLangArray();
-    }
-    
     /**
      * Sets the default locale 'language' to work with. Messages are translated tho this
      * default language whe the p() function is called. 
      * @param type $lang
      */
-    public function setLocale($locale) {
-        $this->locale = $locale;
+    public static function setLocale($locale) {
+        self::$locale = $locale;
     }
 
     /**
      * Sets the range of available languages 'locales' by the system.
      * @param type $languagesArray
      */
-    public function setlanguages($languagesArray) {
-        $this->languages = $languagesArray;
+    public static function setlanguages($languagesArray) {
+        self::$languages = $languagesArray;
     }
+    
+    private $systemTranslations;
+    private $newTranslations;
+    private $messages;
+    
+    
+    function __construct() {
+        $this->messages = self::initLangArray();
+    }
+    
     
     /** 
      * Creates and initilize a language array with the existing languages files.
@@ -63,7 +62,7 @@ class i18nMessages {
      * 
      * @param type $subdirectory the subdirectory withing the languages files
      */
-    private static function initLangArray($subdirectory="") {
+    private function initLangArray($subdirectory="") {
         $langsArray = self::createLangArray();
         $ext = self::phpExtension; 
         $ds = DIRECTORY_SEPARATOR;
@@ -92,9 +91,9 @@ class i18nMessages {
      * } 
      * @return array  the new empty Languages Array.
      */
-    private static function createLangArray(){
+    private function createLangArray(){
         $langArray = array();
-        $languages = $this->languages;
+        $languages = self::$languages;
         foreach ($languages as $lang) {
             $langArray[$lang] = array();
         }
@@ -189,7 +188,7 @@ class i18nMessages {
         $delimiter = $message[0];
         $message = trim($message, $delimiter);
         $translated = "";
-        foreach ($this->languages as $lang) {
+        foreach (self::$languages as $lang) {
             $this->newTranslations[$lang][$message] = array($translated, $filename , $lineNum , $delimiter);
         }
     }
@@ -211,7 +210,7 @@ class i18nMessages {
             mkdir($systemDir, 0755, true);
         }
 
-        foreach ($this->languages as $lang) {
+        foreach (self::$languages as $lang) {
             $ext = self::phpExtension;
             // NEW FILE CREATION
             $copy = self::copyright;
@@ -258,8 +257,8 @@ class i18nMessages {
      * @return type the translated message.
      */
     public function getMessage($message) {
-        if (isset($this->messages[$this->locale][$message]))
-            return (empty($this->messages[$this->locale][$message])) ? $message : $this->messages[self::$locale][$message];
+        if (isset($this->messages[self::$locale][$message]))
+            return (empty($this->messages[self::$locale][$message])) ? $message : $this->messages[self::$locale][$message];
         else {
             return $message;
         }
