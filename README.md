@@ -24,7 +24,7 @@ i18nMessages::setLocale('fr');
 //Sets all languages to work with.
 i18nMessages::setlanguages(array('en','es','de','fr'));
 
-//Sets the root directory where is locate the languages folder.
+//Sets the root directory where is located the languages folder.
 i18nMessages::setRootDirectory($rootDir);
 ?>
 ```
