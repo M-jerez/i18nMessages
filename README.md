@@ -46,9 +46,9 @@ $messages->setlanguages(array('en','es','de'));
 ```php
 // IMPORTANT: dont use variables when call the p() function
 $number = 12345;
-p("item: $number") //THIS IS NOT ALLOWED, throws fatal error when compile Translation-Files
+p("item: $number"); // THIS IS NOT ALLOWED, throws fatal error when compile Translation-Files
 
-p("item: %d", $number) // THIS IS CORRECT
+p("item: %d", $number); // THIS IS CORRECT
        
 ```
 ### Translation-Files Automatic Generation.
