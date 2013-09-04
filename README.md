@@ -55,7 +55,7 @@ p("item: %d", $number); // THIS IS CORRECT
 ```php
 //import and init.
 require_once 'i18nMessages.php';
-$messages = new i18nMessages('fr');
+$messages = new i18nMessages();
 
 //Scan php files and generates the translation files. 
 $messages->compile();
