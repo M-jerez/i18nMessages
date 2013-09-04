@@ -9,25 +9,25 @@ class i18nMessages {
     //const pattern = "/\sp\(.*\)/";
     const copyright = "/** \n* This file is generated with 'i18nMessages.php' \n* Website: http://github.com/M-jerez/ \n* Author : m-jerez \n*/";
     const languagesDir = 'lang';
-    const oldDir = 'old';
+    const systemDir = 'system';
     const phpExtension = '.php';
     
     
     public static $rootDir = __DIR__;
-    public static $locale = 'es';
-    public static $languages = array('en', 'es');
+    public static $locale = 'en';
+    public static $languages = array('en', 'es', 'fr', 'de');
 
     /**
-     * Sets the default language 'Locale' to work with. Messages are translated tho this
-     * language whe the p() function is called. 
+     * Sets the default locale 'language' to work with. Messages are translated tho this
+     * default language whe the p() function is called. 
      * @param type $lang
      */
-    public static function setWorkingLanguage($lang) {
+    public static function setLocale($lang) {
         self::$locale = $lang;
     }
 
     /**
-     * Sets the range of available languages by the system.
+     * Sets the range of available languages 'locales' by the system.
      * @param type $languagesArray
      */
     public static function setlanguages($languagesArray) {
@@ -42,7 +42,7 @@ class i18nMessages {
         self::$rootDir = $rootDir;
     }
     
-    private $oldTranslations;
+    private $systemTranslations;
     private $newTranslations;
     private $messages;
     
@@ -63,16 +63,16 @@ class i18nMessages {
         $langsArray = self::createLangArray();
         $ext = self::phpExtension; 
         $ds = DIRECTORY_SEPARATOR;
-        $languagesDir = self::$rootDir. $ds .self::languagesDir. $ds .$subdirectory;
+        $sds = empty($subdirectory)?"":$ds;
+        $languagesDir = self::$rootDir. $ds .self::languagesDir. $ds .$subdirectory.$sds;
         $phpFiles = glob("$languagesDir*$ext");        
         foreach ($phpFiles as $filename) {
-            foreach ($langsArray as $lang) {
-                $langFilename = $languagesDir . $lang . $ext;
-                if ($filename == $langFilename) {
-                    $aux = require($langFilename);
-                    if (is_array(aux))
-                        $langsArray[$lang] = $aux;
-                }
+            $lang = str_replace($languagesDir, "", $filename);
+            $lang = str_replace($ext, "", $lang);
+            if(isset($langsArray[$lang])){
+                $aux = require($filename);
+                if (is_array($aux))
+                  $langsArray[$lang] = $aux;
             }
         }        
         return $langsArray;
@@ -98,13 +98,13 @@ class i18nMessages {
     }
     
     /**
-     * Scans all php files searching for calls to the p() function and creates 
-     * languages files from the calls found.
-     * 
+     * Scans all php files searching for calls to the p() function, then creates 
+     * languages files from the found calls. 
      */
-    public function compile() {
-        $this->newTranslations = self::initLangArray();        
-        $this->oldTranslations = self::initLangArray(self::oldDir);
+    public function compile($rootDir=null) {
+        if($rootDir!=null) self::setRootDirectory ($rootDir);
+        $this->newTranslations = self::createLangArray();        
+        $this->systemTranslations = self::initLangArray(self::systemDir);
         $this->readSources();
         $this->save();
     }    
@@ -124,10 +124,9 @@ class i18nMessages {
                 continue;
             $content = file_get_contents($filename);
             $tokens = token_get_all($content);
-            self::dump_tokens($tokens);
             for ($index = 0; $index < count($tokens); $index++) {
                 $token = &$tokens[$index];
-                if(is_array($token) && $token[0] === T_STRING && $token[1] === p){
+                if(is_array($token) && $token[0] === T_STRING && $token[1] === 'p'){
                     // this is the token of the 'p' function.
                     $index = $this->scanMessage($tokens, $index, $filename, $token[2]);
                 } 
@@ -150,16 +149,14 @@ class i18nMessages {
         return $files;
     }
     
-    /**
-     * function used for debug only
-     */
-    private static function dump_tokens($tokens){
-        foreach ($tokens as &$value) {
-            if(is_array($value))
-              $value[0] = token_name ($value[0]); 
-        }
-        var_dump($tokens);
-    }
+    
+//    private static function dump_tokens($tokens){
+//        foreach ($tokens as &$value) {
+//            if(is_array($value))
+//              $value[0] = token_name ($value[0]); 
+//        }
+//        var_dump($tokens);
+//    }
     
     /**
      * Search for the first argument of the p() function, wich corresponds to the 
@@ -193,8 +190,11 @@ class i18nMessages {
      * @param type $filename the file name where it appears.
      */
     private function setNewEntry($message, $lineNum, $filename) {
+        $delimiter = $message[0];
+        $message = trim($message, $delimiter);
+        $translated = "";
         foreach (self::$languages as $lang) {
-            $this->newTranslations[$lang][$message] = "$filename : Line $lineNum";
+            $this->newTranslations[$lang][$message] = array($translated, $filename , $lineNum , $delimiter);
         }
     }
 
@@ -203,51 +203,56 @@ class i18nMessages {
      * Saves the Languages Arrays into a languages files.
      * A language file is the array written in php code.
      * One file is generated by each language in the language array.
-     * A copy of old messages is stored in the /old directory.
+     * A copy of old messages is stored in the /system directory.
      */
     private function save() {
         $langsDir = self::$rootDir . DIRECTORY_SEPARATOR . self::languagesDir . DIRECTORY_SEPARATOR;
-        $oldsDir = $langsDir . self::oldDir . DIRECTORY_SEPARATOR;
+        $systemDir = $langsDir . self::systemDir . DIRECTORY_SEPARATOR;
         if (!file_exists($langsDir)) {
-            mkdir($langsDir, 0777, true);
+            mkdir($langsDir, 0755, true);
         }
-        if (!file_exists($oldsDir)) {
-            mkdir($oldsDir, 0777, true);
+        if (!file_exists($systemDir)) {
+            mkdir($systemDir, 0755, true);
         }
 
         foreach (self::$languages as $lang) {
             $ext = self::phpExtension;
-            $filename = "$lang$ext";
             // NEW FILE CREATION
             $copy = self::copyright;
-            $result = "<?php \n$copy \nreturn array( \n\n";
-            foreach ($this->newTranslations[$lang] as $key => $value) {          
-                $message = $this->messages[$lang][$key] ?: "";
-                If (empty($message) && isset($this->oldTranslations[$lang][$key]))
-                    $message = $this->oldTranslations[$lang][$key];                
-                $linenum = $value;
-                $delimiter = $key[0];
-                $result .= "/* $linenum */\n$key \n => \n$delimiter$message$delimiter \n, \n\n";
+            $userfile = "<?php \n$copy \nreturn array( \n\n";
+            foreach ($this->newTranslations[$lang] as $message => &$value) {               
+                $translated = $this->messages[$lang][$message];
+                if($translated==null) $translated = $this->systemTranslations[$lang][$message][0]; 
+                if($translated==null) $translated = "";
+                else   $this->newTranslations[$lang][$message][0] = $translated;
+               
+                $filename = $value[1];
+                $linenum = $value[2];
+                $del = $value[3];
+                $userfile .= "/* $filename : line $linenum */\n$del$message$del\n=>\n$del$translated$del\n,";
+                $this->systemTranslations[$lang][$message] = $value;
             }
-            $result .= ");";
-            file_put_contents($langsDir . $filename, trim($result));
+            $userfile .= "\n);";
+            
 
             //BACKUP OLD VALUES
-            /*
-              $result = "<?php \n$copy \nreturn array( \n\n";
-              $old = array_diff_key($this->messages[$lang], $this->newTranslations[$lang]);
-              foreach ($old as $key => $value) {
-              if(empty($value)) continue;
-              $this->oldTranslations[$lang][$key] = $value;
-              }
-              ksort($this->oldTranslations[$lang]);
-              foreach ($this->oldTranslations[$lang] as $key => $value) {
-              $message = addcslashes($value, '"');
-              $result .= "\"$key\" \n => \n\"$message\" \n, \n";
-              }
-              $result .= ");";
-              file_put_contents($LangDirOld.$filename, trim($result));
-             */
+
+            $systemFile = "<?php \n$copy \nreturn array(";
+            foreach ($this->systemTranslations[$lang] as $message => $value) {                
+                $translated = $value[0];
+                $filename = $value[1];
+                $linenum = $value[2];
+                $del = $value[3];
+                $printdel = addcslashes($value[3],$value[3]);
+                $array = "array($del$translated$del,$del$filename$del,$linenum,$del$printdel$del)";
+                $systemFile .= "\n$del$message$del=>$array,";
+            }
+            $systemFile .= "\n);";
+            
+            $langFileName = "$lang$ext";
+            file_put_contents($langsDir . $langFileName, trim($userfile));
+            file_put_contents($systemDir . $langFileName, trim($systemFile));
+             
         }
     }
 
