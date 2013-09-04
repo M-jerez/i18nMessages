@@ -6,7 +6,7 @@
 4. Shows default message if doesn't find a translation.
 5. Works as print or printf.
 6. Keep translated Messages when generates Traslation-Files again.
-7. Backup deleted messages and it's translation to use it later.
+7. Backup deleted messages and it's translations to use it later.
 
 ### Not Implemented.
 * plurals
