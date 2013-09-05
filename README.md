@@ -71,7 +71,7 @@ $messages->compile();
 //Generates the translation files starting from the 'rootDir'. 
 $messages->compile('rootDir');
 ```
-### Generated Files.
+### Generated Files & Directories.
 ![Generated Files](https://raw.github.com/M-jerez/i18nMessages/master/generated-files.png)
 
 ### //TODO : Html editor for Translation-Files.
