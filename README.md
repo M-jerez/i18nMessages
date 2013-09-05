@@ -68,7 +68,7 @@ i18nMessages::setlanguages(array('en','es','de','fr'));
 //Scan php files and generates the translation files. 
 $messages->compile();
 
-//Generates the Translation-Files scaning all .php files and subfolders, starting from the 'rootDir'. 
+//Generates the Translation-Files scanning .php extension and subfolders, starting from the 'rootDir'. 
 $messages->compile('rootDir');
 ```
 ### Generated Files & Directories.
