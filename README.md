@@ -11,6 +11,7 @@
 ### Not Implemented.
 * plurals
 * contexts
+* Only parse php source code.
 
 
 
