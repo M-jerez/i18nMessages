@@ -23,7 +23,7 @@ require_once 'i18nMessages.php';
 i18nMessages::setLocale('fr');
 
 //Sets the languages to work with.
-i18nMessages::setlanguages(array('en','es','de','fr'));
+i18nMessages::setlanguages('en','es','de','fr');
 
 //Sets the root directory where is located the languages folder.
 i18nMessages::setRootDirectory($rootDir);
@@ -63,7 +63,7 @@ require_once 'i18nMessages.php';
 $messages = new i18nMessages();
 
 //Sets the languages to generate.
-i18nMessages::setlanguages(array('en','es','de','fr'));
+i18nMessages::setlanguages('en','es','de','fr');
 
 //Scan php files and generates the translation files. 
 $messages->compile();
