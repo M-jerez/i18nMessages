@@ -5,7 +5,7 @@
 2. Translations-Files are php Arrays. less friendly but doesn't need external tools, best performace than .ini
 4. Shows default message if doesn't find a translation.
 5. Works as print or printf.
-6. Keep translated Messages when generates Traslation-Files again.
+6. Keep translated Messages when Traslation-Files are generated again.
 7. Backup deleted messages and it's translations to use it later.
 
 ### Not Implemented.
