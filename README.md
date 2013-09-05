@@ -71,6 +71,7 @@ $messages->compile();
 $messages->compile('rootDir');
 ```
 ### Generated Files.
+![Generated Files](https://raw.github.com/M-jerez/i18nMessages/master/generated-files.png)
 
 ### //TODO : Html editor for Translation-Files.
 It would be a great tool to make translation friendly for non programers.
