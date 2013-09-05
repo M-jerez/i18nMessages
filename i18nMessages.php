@@ -285,3 +285,23 @@ function p($string){
         echo $messages->getMessage($string);
     }
 }
+
+/**
+ * Returns the translated message or the message itself if there is no translation for the message. 
+ * This function can be used both as print() or sprintf().
+ * $string = g("hello world") or $string = g("%s %s", 'hello', 'world').
+ * @staticvar null $messages
+ * @param type $string the string to tranlates
+ */
+function g($string){
+    static $messages = null;
+    if ($messages==null)
+        $messages = new i18nMessages();
+    if (count(func_get_args()) > 1) {
+        $args = func_get_args();
+        unset($args[0]);
+        return sprintf($messages->getMessage($string), $args);
+    } else {
+        return $messages->getMessage($string);
+    }
+}

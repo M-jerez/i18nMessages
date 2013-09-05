@@ -36,7 +36,7 @@ i18nMessages::setRootDirectory($rootDir);
         <div>
         <?php
             p('hello world'); //Prints the translated message.
-            $string = g('hello world'); //Returs the translated message.
+            $string = g('hello world'); //Returns the translated message.
         ?>
         </div>
         <div>
