@@ -29,7 +29,7 @@ i18nMessages::setlanguages(array('en','es','de','fr'));
 i18nMessages::setRootDirectory($rootDir);
 ?>
 ```
-```html
+```php
 <!-- file : index.php -->
 <html>
     <head></head>
