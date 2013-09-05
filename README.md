@@ -21,7 +21,7 @@
 require_once 'i18nMessages.php';
 i18nMessages::setLocale('fr');
 
-//Sets all languages to work with.
+//Sets the languages to work with.
 i18nMessages::setlanguages(array('en','es','de','fr'));
 
 //Sets the root directory where is located the languages folder.
@@ -61,12 +61,16 @@ p("item: %d", $number); // THIS IS CORRECT
 require_once 'i18nMessages.php';
 $messages = new i18nMessages();
 
+//Sets the languages to generate.
+i18nMessages::setlanguages(array('en','es','de','fr'));
+
 //Scan php files and generates the translation files. 
 $messages->compile();
 
 //Generates the translation files starting from the 'rootDir'. 
 $messages->compile('rootDir');
 ```
+### Generated Files.
 
 ### //TODO : Html editor for Translation-Files.
 It would be a great tool to make translation friendly for non programers.

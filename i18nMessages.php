@@ -129,7 +129,7 @@ class i18nMessages {
             $tokens = token_get_all($content);
             for ($index = 0; $index < count($tokens); $index++) {
                 $token = &$tokens[$index];
-                if(is_array($token) && $token[0] === T_STRING && $token[1] === 'p'){
+                if(is_array($token) && $token[0] === T_STRING && ($token[1] === 'p' || $token[1] === 'g') ){
                     // this is the token of the 'p' function.
                     $index = $this->scanMessage($tokens, $index, $filename, $token[2]);
                 } 

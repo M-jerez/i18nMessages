@@ -23,6 +23,7 @@ i18nMessages::setLocale('fr');
     <head></head>
     <body>
         <div><?php p('hello world'); ?></div>
+        <div><?php echo g('hello world'); ?></div>
     </body>
 </html>
 
