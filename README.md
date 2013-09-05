@@ -35,24 +35,25 @@ i18nMessages::setRootDirectory($rootDir);
     <body>
         <div>
         <?php
-            p('hello world'); //works as print but translates the message
+            p('hello world'); //Prints the translated message.
+            $string = g('hello world'); //Returs the translated message.
         ?>
         </div>
         <div>
         <?php 
-            p('hello world %s', 'Tony'); //works as printf but translaes the message
+            p('hello world %s', 'Tony'); //Formats and Prints the translated message.
+            $string = g('hello world %s', 'Tony'); //Formats and Returns the translated message.
         ?>
         </div>
     </body>
 </html>
 ```
 ```php
-// IMPORTANT: dont use variables when call the p() function
+// IMPORTANT: dont use variables when call the p() or g() functions.
 $number = 12345;
 p("item: $number"); // THIS IS NOT ALLOWED, throws fatal error when compile Translation-Files
 
-p("item: %d", $number); // THIS IS CORRECT
-       
+p("item: %d", $number); // THIS IS CORRECT       
 ```
 ### Automatic Generation of Translation-Files.
 ```php
